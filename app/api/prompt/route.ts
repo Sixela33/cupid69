@@ -3,17 +3,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import { createClient } from '@/utils/supabase/server';
 import { chatMessage } from '@/app/invite/page';
-
-export enum MessageTypes {
-    USER = "user", 
-    ASSISTANT = "assistant", 
-    SYSTEM = "system", 
-    TOOL = "tool"
-}
+import { MessageTypes } from '@/app/types';
 
 export const POST = async (
   req: NextRequest,
-  res: NextResponse
 ) => {
     const data = await req.json();
 

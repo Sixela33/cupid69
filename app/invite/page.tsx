@@ -31,20 +31,8 @@ export default function LoveLetter() {
 
   const navigate = useRouter();
 
-  const fetchPrompt = async () => {
-    const { data, error } = await supabase.from('ChatRooms')
-      .select('*')
-      .eq('id', id)
-    
-    if(!data) {
-      throw new Error("No data")
-    }
-
-    setSystemPrompt(data[0].system_message)
-  }
-
   const fetchChat = async () => {
-    const {data: chatData, error: chatError} = await supabase.from('Messages')
+    const {data: chatData} = await supabase.from('Messages')
       .select('*')
       .eq('chat_id', id)
       .order('created_at', {ascending: true})
@@ -57,7 +45,7 @@ export default function LoveLetter() {
     
     setIsSubmitting(true)
     try {
-      const response = await fetch("/api/prompt", {
+      await fetch("/api/prompt", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -76,14 +64,25 @@ export default function LoveLetter() {
     }
   }
 
-  const {data, isLoading, error} = useQuery({
+  const {data, isLoading} = useQuery({
     queryKey: ['chat', id],
     queryFn: fetchChat
   })
 
   React.useEffect(() => {
+    const fetchPrompt = async () => {
+      const { data } = await supabase.from('ChatRooms')
+        .select('*')
+        .eq('id', id)
+      
+      if(!data) {
+        throw new Error("No data")
+      }
+  
+      setSystemPrompt(data[0].system_message)
+    }
     fetchPrompt()
-  }, [])
+  }, [id, supabase])
 
   React.useEffect(() => {
     // TODO THIS IS NOT WORKING Scroll to bottom when new messages arrive

@@ -19,20 +19,22 @@ export default function Home() {
   const [agents, setAgents] = useState<Agent[]>([])
   const [loading, setLoading] = useState(true);
 
-  const fetchAgents = async () => {
-    try {
-      const { data, error } = await supabase.from('ChatRooms').select(`*`);
-      if (error) throw error;
-      setAgents(data as Agent[]);
-    } catch (error) {
-      console.error('Error fetching agents:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+
 
   useEffect(() => {
+    const fetchAgents = async () => {
+      try {
+        const { data, error } = await supabase.from('ChatRooms').select(`*`);
+        if (error) throw error;
+        setAgents(data as Agent[]);
+      } catch (error) {
+        console.error('Error fetching agents:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchAgents()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // TODO USE STYLE VARIABLES INSTEAD OF HARDCODING
