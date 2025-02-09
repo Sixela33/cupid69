@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Send } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 export type chatMessage = {
   id: number;
@@ -21,12 +22,14 @@ export default function LoveLetter() {
   const id = searchParams.get('key')
   const supabase = createClient()
   const queryClient = useQueryClient()
+  
   const scrollRef = React.useRef<HTMLDivElement>(null)
 
   const [systemPrompt, setSystemPrompt] = React.useState('')
-  const [chat, setChat] = React.useState<chatMessage[]>([])
   const [inputValue, setInputValue] = React.useState('')
   const [isSubmitting, setIsSubmitting] = React.useState(false)
+
+  const navigate = useRouter();
 
   const fetchPrompt = async () => {
     const { data, error } = await supabase.from('ChatRooms')
@@ -62,8 +65,8 @@ export default function LoveLetter() {
         body: JSON.stringify({ 
           message: inputValue,
           chat_id: id,
-          system_message: systemPrompt, 
-          history: chat
+          system_message: systemPrompt || 'system', 
+          history: data
         })
       })
       setInputValue('')
@@ -83,7 +86,7 @@ export default function LoveLetter() {
   }, [])
 
   React.useEffect(() => {
-    // Scroll to bottom when new messages arrive
+    // TODO THIS IS NOT WORKING Scroll to bottom when new messages arrive
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight
     }
@@ -99,7 +102,8 @@ export default function LoveLetter() {
   return (
     <div className="flex flex-col h-screen max-w-4xl mx-auto p-4">
       <Card className="flex-1 mb-4">
-        <CardHeader className="border-b p-4">
+        <CardHeader className="border-b p-4 flex flex-row items-center">
+          <Button variant="link" onClick={() => navigate.push('/')}>Back</Button>
           <h2 className="text-2xl font-bold">Chat Room {id}</h2>
         </CardHeader>
         <ScrollArea className="h-[calc(100vh-12rem)] p-4" ref={scrollRef}>
